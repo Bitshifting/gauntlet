@@ -7,7 +7,7 @@ API Endpoints at (you know the URI .alexkersten.com) port 6699
 
 # API Detail
 
-## Account functionality
+## Accounts
 
 ### `/gauntlet/account/register/:username/:passwordhash`
 
@@ -25,7 +25,7 @@ Response like `{"success":true,"auth":"1234567890abcdef"}`
 
 ### `/gauntlet/minions/list/:auth/:username`
 
-Returns a list of collected minions (with all attributes) belonging to your user account (inferred from auth token). Username field is ingored but could be used for future use if you"re listing someone else"s collection.
+Returns a list of collected minions (with all attributes) belonging to `username`.
 
 Response like `[{<SEE MINION OBJECT SPECIFICATION>},]`
 
@@ -75,6 +75,37 @@ The following object represents a minion and will be returned.
 
 ### Move IDs
 
-The following IDs map to the following base moves.
+The following IDs map to the following base moves. (TODO: For now look at the google doc)
+
+## Battles
+
+A battle is a conflict between one of your minions and another minion. You can create a battle at any time and a minion can be in multiple battles at once (all separate 'instances' of the minion - health, etc. is tracked per battle instance and multiple of them can be going on at once with the same base minion, you don't have to heal your minions, etc.) This should make it more social if you want one of your minions to fight two different friends' minions in about the same timeframe.
+
+### `/gauntlet/battle/start/:auth/:yourMinionID/:targetMinionID`
+
+Whoever starts a battle goes first. Should use /minions/list on the opponent to find the minionID that you want to fight, and then name both it and the ID of one of your own minions to battle.
+
+These battles will be visible when you do a /battle/list and the server will keep track of the state of health, turn order, etc. in a particular battle - but any involved minions will not be preoccupied (they can do multiple battles at once as separate instances).
+
+Response like `{"success":true}`
+
+### `/gauntlet/battle/list/:auth/:username`
+
+Returns a list of battles for this user, where each entry in the list has a battle ID and the objects of the involved minions, as well as the turn state. **You should poll this periodically to check if you have any battle requests and then have user input which triggers calls to other API requests for battle**. if `active` then both minions are still alive.
+
+Response like `[{"_id":"1234","yourMinion":{minion object},"targetMinion":{minion object},"yourTurn":false,"active":true},]`
+
+### `/gauntlet/battle/move/:auth/:battleID/:move`
+
+Performs `move` in the ongoing battle `battleID` presuming it is your turn. `move` is a number 1-4 (of the moves that your minion knows).
+
+Doing this will update the state of the battle. Poll battle/list to see any new damage, etc.
+
+Invoking this can cause a battle to end (opponent or you die, etc). In this case, the battle becomes inactive and the client can determine if it won by looking at enemy health vs your health - inactive battles are still returned in the battle/list call, and can be displayed by clients like an archive/history.
+
+Response like `{"success":true}`
+
+
+
 
 //TODO

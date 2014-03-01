@@ -118,7 +118,7 @@ function checkToken(token, user) {
       throw err;
     }
 
-    collection.find({username: user, _id: token}, {}, function(err, cursor) {
+    collection.find({username: user, _id: new ObjectId(token)}, {}, function(err, cursor) {
       if (err) {
         throw err;
       }
@@ -139,11 +139,12 @@ function checkToken(token, user) {
  */
 app.get('/gauntlet/minions/list/:auth/:username', function (req, res) {
   console.log("Attempting to list minions...");
-  if (!checkToken(req.params.auth, req.params.username)) {
-    console.log("ERR_list_1");
-    res.json({success:false});
-    return false;
-  }
+  //Usename can be different than auth here, don't bother checking.
+ // if (!checkToken(req.params.auth, req.params.username)) {
+ //   console.log("ERR_list_1");
+ //   res.json({success:false});
+ //  return false;
+ // }
 
   db.collection('minions', function(err, collection) {
     if (err) {
