@@ -282,12 +282,13 @@ app.get('/gauntlet/battle/start/:auth/:username/:targetUsername/:yourMinionID/:t
     var obj = {
       host: req.params.username,
       guest: req.params.targetUsername,
-      minionHost: hostMinion
-      minionGuest: guestMinion
+      minionHost: hostMinion,
+      minionGuest: guestMinion,
       hostTurn: true,
       active: true,
       hostHealth: hostMinion.minion_stat_health,
       guestHealth: guestMinion.minion_stat_health,
+      lastMoveName: '?',
     }
 
     console.log("Creating battle state:\n%j", obj);
@@ -346,6 +347,94 @@ app.get('/gauntlet/battle/list/:auth/:username', function(req, res) {
 
   });
 });
+
+
+function getBattleFromID(battleID) {
+  console.log("Attempting get battle from ID...");
+
+  db.collection('battles', function(err, collection) {
+    if (err) {
+      console.log("ERR_bget_1");
+      throw err;
+    }
+
+    collection.find({_id: new ObjectId(battleID)},{}, function(err, cursor) {
+      if (err) {
+        console.log("ERR_bget_2");
+        throw err;
+      }
+
+      cursor.toArray(function(err, documents) {
+        if (err) {
+          console.log("ERR_bget3");
+          throw err;
+        }
+        if (documents == null)
+          return null;
+
+        console.log("Returning looked-up battle:\n%j", documents[0]);
+        return documents[0];
+      });
+    });
+  });
+}
+/**
+ * A player makes a move. This needs to update active and HPs and switch the turn at a minium.
+ */
+app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, res) {
+  console.log("Player attempting to make move " + req.params.username);
+  if (!checkToken(req.params.auth, req.params.username)) {
+    res.json({success:false});
+    return false;
+  }
+
+  db.collection('battles', function (err, collection) {
+    if (err) {
+      console.log("ERR_move_1");
+      res.json({success:false});
+      throw err;
+    }
+
+    //get the battle state
+    var battle = getBattleFromID(req.params.battleID);
+    if (battle == null)
+      {
+        console.log("Null battle state............");
+        res.json({success:false});
+        return;
+      }
+
+    //make sure it's our turn...
+    if (((battle.hostTurn == true) && (req.params.username != battle.host)) || ((battle.hostTurn == false) && (req.params.username != battle.guest))) {
+      //Does this look liike your turn? are you fscking sorry?!
+      console.log("wait yer turn");
+      res.json({success:false});
+      return;
+    }
+
+    //Ok go, update the health and re-write the state!
+    //TODO: For now just -1 from their health, read from moves integer
+    if (battle.hostTurn) {
+      battle.guestHealth -= 1;
+      if (guestHealth <= 0)
+        battle.active = false;
+    }else {
+      battle.hostHealth -= 1;
+      if (hostHealth <= 0)
+        battle.active = false;
+    }
+
+    collection.update({_id: new ObjectId(req.params.batleID)}, battle, function (err, count) {
+      if (err) {
+        res.json({success:false});
+        throw err;
+      }
+      res.json({success:true});
+    });
+
+  });
+});
+
 
 app.listen(6699);
 console.log("Gauntlet server listening on 6699!");

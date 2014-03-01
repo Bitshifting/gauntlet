@@ -93,7 +93,7 @@ Response like `{"success":true}`
 
 Returns a list of battles for this user, where each entry in the list has a battle ID and the objects of the involved minions, as well as the turn state. **You should poll this periodically to check if you have any battle requests and then have user input which triggers calls to other API requests for battle**. if `active` then both minions are still alive.
 
-Response like `[{"_id":"1234","hostMinion":{minion object},"guestMinion":{minion object},"hostTurn":false,"active":true,"hostHealth":10,"guestHealth":10},]`
+Response like `[{"_id":"1234","host":"name1","guest":"name2",hostMinion":{minion object},"guestMinion":{minion object},"hostTurn":false,"active":true,"hostHealth":10,"guestHealth":10,"lastMoveName":"someName"},]`
 
 ### `/gauntlet/battle/move/:auth/:username/:battleID/:move`
 
