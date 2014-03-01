@@ -81,7 +81,7 @@ The following IDs map to the following base moves. (TODO: For now look at the go
 
 A battle is a conflict between one of your minions and another minion. You can create a battle at any time and a minion can be in multiple battles at once (all separate 'instances' of the minion - health, etc. is tracked per battle instance and multiple of them can be going on at once with the same base minion, you don't have to heal your minions, etc.) This should make it more social if you want one of your minions to fight two different friends' minions in about the same timeframe.
 
-### `/gauntlet/battle/start/:auth/:yourMinionID/:targetMinionID`
+### `/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID`
 
 Whoever starts a battle goes first. Should use /minions/list on the opponent to find the minionID that you want to fight, and then name both it and the ID of one of your own minions to battle.
 
@@ -95,7 +95,7 @@ Returns a list of battles for this user, where each entry in the list has a batt
 
 Response like `[{"_id":"1234","yourMinion":{minion object},"targetMinion":{minion object},"yourTurn":false,"active":true},]`
 
-### `/gauntlet/battle/move/:auth/:battleID/:move`
+### `/gauntlet/battle/move/:auth/:username/:battleID/:move`
 
 Performs `move` in the ongoing battle `battleID` presuming it is your turn. `move` is a number 1-4 (of the moves that your minion knows).
 
