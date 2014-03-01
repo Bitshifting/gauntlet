@@ -66,7 +66,7 @@ app.get('/gauntlet/account/register/:username/:passwordhash', function(req, res)
 app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, res) {
   db.collection('accounts', function(err, collection) {
     if (err) {
-      res.jsonp({success:false});
+      res.json({success:false});
       throw err;
     }
 
@@ -74,7 +74,7 @@ app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, 
       cursor.count(function(err, count) {
         if (count == 0) {
           console.log("User failed authentication");
-          res.jsonp({success:false,auth:'null'});
+          res.json({success:false,auth:'null'});
           return;
         }
 
@@ -83,14 +83,32 @@ app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, 
 
         cursor.toArray(function(err, documents) {
           console.log("Sending auth token.");
-          res.jsonp({success:true,auth:documents[0]._id});
+          res.json({success:true,auth:documents[0]._id});
         });
       });
     });
   });
 });
 
+/**
+ * Checks if an authentication token corresponds to a particular user.
+ */
+function checkAuth(token, user) {
+  db.collection('accounts', function(err, collection) {
+    if (err) {
+      res.json({success:false});
+      throw err;
+    }
 
+    collection.find({username: user, _id: token}, {}, function(err, cursor) {
+      cursor.count(function(err, count) {
+        if (count == 0)
+          return false;
+        return true;
+      });
+    });
+  });
+}
 
 
 app.listen(6699);
