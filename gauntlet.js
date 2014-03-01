@@ -176,7 +176,7 @@ app.get('/gauntlet/minions/list/:auth/:username', function (req, res) {
 /**
  * Capture a minion!
  */
-app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minon_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4/:minion_stat_strength/:minion_stat_intelligence/:minion_stat_dexterity/:minion_stat_speed/:minion_stat_health/:minion_stat_coffeemaking', function(req, res) {
+app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minion_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4/:minion_stat_strength/:minion_stat_intelligence/:minion_stat_dexterity/:minion_stat_speed/:minion_stat_health/:minion_stat_coffeemaking', function(req, res) {
   console.log("Attempting to capture minion...");
   if (!checkToken(req.params.auth, req.params.username)) {
     console.log('ERR_capture_1');
