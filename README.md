@@ -54,7 +54,7 @@ Response like `{"success":true, "_id":"abc1234"}`
 The following object represents a minion and will be returned.
 
 `{`
-`"_id":"1234abc",
+`"_id":"1234abc",`
 `"minion_name":"name",`
 `"minion_picture":"http://your.face",`
 `"minion_description":"Some biography about this minion",`
