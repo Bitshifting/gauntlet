@@ -191,6 +191,8 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
       throw err;
     }
 
+    //TODO: verify values sum to 17 and that type is one of the four valid types.
+
     var obj =   {
       date: Math.round(new Date().getTime() / 1000),
       username: req.params.username,
@@ -286,9 +288,10 @@ app.get('/gauntlet/battle/start/:auth/:username/:targetUsername/:yourMinionID/:t
       minionGuest: guestMinion,
       hostTurn: true,
       active: true,
-      hostHealth: hostMinion.minion_stat_health,
-      guestHealth: guestMinion.minion_stat_health,
+      hostHealth: hostMinion.minion_stat_health * 10,
+      guestHealth: guestMinion.minion_stat_health * 10,
       lastMoveName: '?',
+      lastDamage: 0,
     }
 
     console.log("Creating battle state:\n%j", obj);
@@ -378,6 +381,25 @@ function getBattleFromID(battleID) {
     });
   });
 }
+
+/**
+ * move coefficients for strength, intelligence dexterity, coffeemaking, speed
+ * and health respectively
+ */
+var moveStatLUT = [
+
+
+]
+/**
+ * Damage is a function of the move's values multiplied by the sender's corresponding
+ * stats for the move's values, all added together (dot product), minus half the
+ * target's same dot product. Then, multiplied by 2 or 0.5 based on the triangle bonuses.
+ */
+function getDamageValue(moveId, sender, target) {
+  var dmg = t
+}
+
+
 /**
  * A player makes a move. This needs to update active and HPs and switch the turn at a minium.
  */
@@ -397,7 +419,7 @@ app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, r
 
     //get the battle state
     var battle = getBattleFromID(req.params.battleID);
-    if (battle == null)
+    if (battle == null)`
       {
         console.log("Null battle state............");
         res.json({success:false});
@@ -412,17 +434,55 @@ app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, r
       return;
     }
 
+    if (!battle.active) {
+    //stop trying to make this battle happen it's not going to happen
+      console.log("get out");
+      res.json({success:false});
+      return;
+    }
+
+    var moveInternalID;
+
+    switch (req.params.move) {
+      case 1:
+        moveInternalID = battle.hostTurn ? battle.host.minion_moveID1 : battle.guest.minion_moveID1;
+        battle.lastMoveName = battle.hostTurn ? battle.host.minion_moveAlias1 : battle.guest.minion_moveAlias1;
+        break;
+      case 2:
+              moveInternalID = battle.hostTurn ? battle.host.minion_moveID2 : battle.guest.minion_moveID2;
+        battle.lastMoveName = battle.hostTurn ? battle.host.minion_moveAlias2 : battle.guest.minion_moveAlias2;
+        break;
+      case 3:
+              moveInternalID = battle.hostTurn ? battle.host.minion_moveID3 : battle.guest.minion_moveID3;
+        battle.lastMoveName = battle.hostTurn ? battle.host.minion_moveAlias3 : battle.guest.minion_moveAlias3;
+        break;
+      case 4:
+              moveInternalID = battle.hostTurn ? battle.host.minion_moveID4 : battle.guest.minion_moveID4;
+        battle.lastMoveName = battle.hostTurn ? battle.host.minion_moveAlias4 : battle.guest.minion_moveAlias4;
+        break;
+      default:
+        console.log("that's not a valid number 1 through 4");
+        res.json({success:false});
+        return;
+    }
+
+    var lstDmg;
     //Ok go, update the health and re-write the state!
     //TODO: For now just -1 from their health, read from moves integer
     if (battle.hostTurn) {
-      battle.guestHealth -= 1;
+      lstDmg = getDamageValue(moveInternalID, host, target);
+      battle.guestHealth -= lstDmg;
       if (guestHealth <= 0)
         battle.active = false;
     }else {
-      battle.hostHealth -= 1;
+      lstDmg = getDamageValue(moveInternalID, target, host);
+      battle.hostHealth -= lstDmg;
       if (hostHealth <= 0)
         battle.active = false;
     }
+
+    battle.lastDamage = lstDmg;
+
 
     collection.update({_id: new ObjectId(req.params.batleID)}, battle, function (err, count) {
       if (err) {
