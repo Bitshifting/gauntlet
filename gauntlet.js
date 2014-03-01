@@ -188,6 +188,7 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
     if (err) {
       console.log('ERR_capture_2');
       res.json({success:false});
+      throw err;
     }
 
     var obj =   {
@@ -199,12 +200,12 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
       minion_type: req.params.minion_type,
       minion_moveID1: req.params.minion_moveID1,
       minion_moveAlias1: req.params.minion_moveAlias1,
-      minion_moveID1: req.params.minion_moveID2,
-      minion_moveAlias1: req.params.minion_moveAlias2,
-      minion_moveID1: req.params.minion_moveID3,
-      minion_moveAlias1: req.params.minion_moveAlias3,
-      minion_moveID1: req.params.minion_moveID4,
-      minion_moveAlias1: req.params.minion_moveAlias4,
+      minion_moveID2: req.params.minion_moveID2,
+      minion_moveAlias2: req.params.minion_moveAlias2,
+      minion_moveID3: req.params.minion_moveID3,
+      minion_moveAlias3: req.params.minion_moveAlias3,
+      minion_moveID4: req.params.minion_moveID4,
+      minion_moveAlias4: req.params.minion_moveAlias4,
       minion_stat_strength: req.params.minion_stat_strength,
       minion_stat_intelligence: req.params.minion_stat_intelligence,
       minion_stat_dexterity: req.params.minion_stat_dexterity,
@@ -225,6 +226,80 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
         }
 
         console.log('Minion captured.');
+        res.json({success:true});
+      }
+    );
+  });
+});
+
+function getMinionFromID(minionID) {
+  console.log("Attempting get minion from ID...");
+
+  db.collection('minions', function(err, collection) {
+    if (err) {
+      console.log("ERR_mget_1");
+      throw err;
+    }
+
+    collection.find({_id: new ObjectId(minionID)},{}, function(err, cursor) {
+      if (err) {
+        console.log("ERR_mget_2");
+        throw err;
+      }
+
+      cursor.toArray(function(err, documents) {
+        if (err) {
+          console.log("ERR_mget3");
+          throw err;
+        }
+        console.log("Returning looked-up minion:\n%j", documents[0]);
+        return documents[0];
+      });
+    });
+  });
+}
+
+/**
+ * Start a battle!
+ */
+app.get('/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID', function(req, res) {
+  if (!checkToken(req.params.auth, req.params.username)) {
+    res.json({success:false});
+    return false;
+  }
+
+  db.collection('battles', function(err, collection) {
+    if (err) {
+      console.log("ERR_startbattle_1");
+      res.json({success:false});
+      throw err;
+    }
+
+    var hostMinion = getMinionFromID(req.params.yourMinionID);
+    var guestMinion = getMinionFromID(req.params.targetMinionID);
+
+    var obj = {
+      host: req.params.username,
+      minionHost: hostMinion
+      minionGuest: guestMinion
+      yourTurn: true,
+      active: true,
+      hostHealth: hostMinion.minion_stat_health,
+      guestHealth: guestMinion.minion_stat_health,
+    }
+
+    console.log("Creating battle state:\n%j", obj);
+
+    collection.insert(
+      obj,
+      function(err, count) {
+        if (err) {
+          console.log('ERR_startbattle_2');
+          res.json({success:false});
+          throw err;
+        }
+
+        console.log('Battle state created.');
         res.json({success:true});
       }
     );
