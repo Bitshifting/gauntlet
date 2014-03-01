@@ -469,7 +469,7 @@ app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, r
 
     //get the battle state
     var battle = getBattleFromID(req.params.battleID);
-    if (battle == null)`
+    if (battle == null)
       {
         console.log("Null battle state............");
         res.json({success:false});
