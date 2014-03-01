@@ -387,47 +387,67 @@ function getBattleFromID(battleID) {
  * and health respectively
  */
 var moveStatLUT = [
-		[3, 0, 0, 0, 2, 0],
-		[3, 0, 2, 0, 0, 0],
-		[0, 1, 0, 0, 4, 0],
-		[1, 4, 0, 0, 0, 0],
-		[4, 0, 0, 4, 0, 1],
-		[5, 0, 0, 0, 0, 0],
-		[0, 0, 4, 0, 4, 1],
-		[0, 0, 0, 0, 5, 0],
-		[0, 4, 3, 0, 0, 0],
-		[0, 7, 0, 0, 0, 0],
-		[0, 6, 0, 0, 1, 0],
-		[0, 0, 0, 5, 4, 2],
-		[0, 7, 2, 0, 0, 2],
-		[0, 0, 0, 0, 7, 2],
-		[0, 0, 0, 7, 0, 0],
-		[0, 3, 0, 3, 0, 0],
-		[3, 0, 5, 0, 0, 1],
-		[0, 2, 0, 0, 4, 0],
-		[0, 0, 0, 0, 6, 0],
-		[0, 1, 5, 0, 0, 0],
-		[2, 0, 0, 0, 4, 0],
-		[0, 0, 6, 0, 0, 0],
-		[0, 0, 7, 0, 1, 2],
-		[0, 0, 0, 5, 0, 1],
-		[2, 0, 0, 3, 0, 1],
-		[0, 3, 0, 2, 0, 0],
-		[0, 0, 1, 4, 0, 0],
-		[0, 0, 0, 3, 2, 0],
-		[2, 0, 0, 4, 0, 0],
-		[0, 0, 0, 0, 4, 0],
-		[0, 0, 0, 0, 5, 1],
-		];
+  [3, 0, 0, 0, 2, 0],
+  [3, 0, 2, 0, 0, 0],
+  [0, 1, 0, 0, 4, 0],
+  [1, 4, 0, 0, 0, 0],
+  [4, 0, 0, 4, 0, 1],
+  [5, 0, 0, 0, 0, 0],
+  [0, 0, 4, 0, 4, 1],
+  [0, 0, 0, 0, 5, 0],
+  [0, 4, 3, 0, 0, 0],
+  [0, 7, 0, 0, 0, 0],
+  [0, 6, 0, 0, 1, 0],
+  [0, 0, 0, 5, 4, 2],
+  [0, 7, 2, 0, 0, 2],
+  [0, 0, 0, 0, 7, 2],
+  [0, 0, 0, 7, 0, 0],
+  [0, 3, 0, 3, 0, 0],
+  [3, 0, 5, 0, 0, 1],
+  [0, 2, 0, 0, 4, 0],
+  [0, 0, 0, 0, 6, 0],
+  [0, 1, 5, 0, 0, 0],
+  [2, 0, 0, 0, 4, 0],
+  [0, 0, 6, 0, 0, 0],
+  [0, 0, 7, 0, 1, 2],
+  [0, 0, 0, 5, 0, 1],
+  [2, 0, 0, 3, 0, 1],
+  [0, 3, 0, 2, 0, 0],
+  [0, 0, 1, 4, 0, 0],
+  [0, 0, 0, 3, 2, 0],
+  [2, 0, 0, 4, 0, 0],
+  [0, 0, 0, 0, 4, 0],
+  [0, 0, 0, 0, 5, 1]
+];
 
+function maxx(a, b) {
+  if (a > b)
+    return a;
+  return b;
+}
+
+function dotProduct(vec1, vec2) {
+  var ret;
+  for (var i = 0; i < vec1.length; i++) {
+    ret += vec1[i] * vec2[i];
+  }
+  return ret;
+}
 /**
  * Damage is a function of the move's values multiplied by the sender's corresponding
  * stats for the move's values, all added together (dot product), minus half the
  * target's same dot product. Then, multiplied by 2 or 0.5 based on the triangle bonuses.
  */
-function getDamageValue(moveId, sender, target) {
-  var dmg = t
-}
+function getDamageValue(moveID, sender, target) {
+  var dmg = dotProduct([sender.minion_stat_strength, sender.minion_stat_intelligence, sender.minion_stat_dexterity, sender.minion_stat_coffeemaking, sender.minion_stat_speed, sender.minion_stat_health], moveStatLUT[moveID]);
+  var mit = dotProduct([target.minion_stat_strength, target.minion_stat_intelligence, target.minion_stat_dexterity, target.minion_stat_coffeemaking, target.minion_stat_speed, target.minion_stat_health], moveStatLUT[moveID]);
+  var mult = (target.minion_type == sender.minion_type) ? 1 :
+  (target.minion_type == "Intern") ? 2 :
+  (target.minion_type == "Ranger") ? ((sender.minion_type == "Mage") ? 0.5 : 2) :
+  (sender.minion_type == "Ranger") ? 0.5 : 2;
+
+  return maxx((dmg * mult) - mit, 0);
+  }
 
 
 /**
