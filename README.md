@@ -38,7 +38,7 @@ Capture a minion for `username`! This should be you (it'll fail otherwise if you
 * `minion_picture` : A direct link to a JPG or PNG somewhere to represent the minion. Will probably be Imgur, but whatever.
 * `minion_description` : A short bio about this minion. For example, where its natural habitat is, what foods it likes to eat, etc.
 * `minion_type` : The class of minion, one of `{Warrior, Ranger, Mage, Intern}`
-* `minion_MoveIDx` : One of four moves to assign to the minion (replace x with a number [1,4]) - this is the internal ID of the base move, since the user can re-name the moves with...
+* `minion_moveIDx` : One of four moves to assign to the minion (replace x with a number [1,4]) - this is the internal ID of the base move, since the user can re-name the moves with...
 * `minion_moveAliasx` : The alias of move x, to be displayed when the move is used.
 * `minion_stat_strength` : Initial strength for minion - these must add up to 17 (base 12 + 5 first assign)
 * `minion_stat_intelligence`
