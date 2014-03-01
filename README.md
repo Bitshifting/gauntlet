@@ -29,7 +29,7 @@ Returns a list of collected minions (with all attributes) belonging to your user
 
 Response like `{"success":true,"minions":[{<SEE MINION OBJECT SPECIFICATION>},]}`
 
-### `/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minon_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4`
+### `/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minon_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4/:minion_stat_strength/:minion_stat_intelligence/:minion_stat_dexterity/:minion_stat_speed/:minion_stat_health/:minion_stat_coffeemaking`
 
 Capture a minion for `username`! This should be you (it'll fail otherwise if your auth token is wrong). The implementing application should provide values for the following fields:
 
@@ -39,6 +39,12 @@ Capture a minion for `username`! This should be you (it'll fail otherwise if you
 * `minion_type` : The class of minion, one of `{Warrior, Ranger, Mage, Intern}`
 * `minion_MoveIDx` : One of four moves to assign to the minion (replace x with a number [1,4]) - this is the internal ID of the base move, since the user can re-name the moves with...
 * `minion_moveAliasx` : The alias of move x, to be displayed when the move is used.
+* `minion_stat_strength` : Initial strength for minion - these must add up to 17 (base 12 + 5 first assign)
+* `minion_stat_intelligence`
+* `minion_stat_dexterity`
+* `minion_stat_speed`
+* `minion_stat_health`
+* `minion_stat_coffeemaking`
 
 The server then replies with a minion object (specified below).
 

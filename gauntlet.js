@@ -111,5 +111,7 @@ function checkAuth(token, user) {
 }
 
 
+
+
 app.listen(6699);
 console.log("gauntlet server listening on 6699");
