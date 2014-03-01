@@ -13,23 +13,30 @@ db.open(function() {
  * User signup
  */
 app.get('/gauntlet/account/register/:username/:passwordhash', function(req, res) {
+  console.log('Attempting to create account "' + req.params.username + '"...\n\t');
 
   db.collection('accounts', function(err, collection) {
     if (err) {
+      console.log("ERR_register_1");
       res.json({success:false});
       throw err;
     }
 
-    console.log('Attempting to create account "' + req.params.username + '"...\n\t');
-
     //Check if the username already exists...
     collection.find({username : req.params.username}, {}, function(err, cursor) {
       if (err) {
+        console.log("ERR_register_2");
         res.json({success:false});
         throw err;
       }
 
       cursor.count(function(err, count) {
+        if (err) {
+          console.log("ERR_register_3");
+          res.json({success:false});
+          throw err;
+        }
+
         if (count != 0) {
           //Aww, already exists.
           console.log('Account already exists');
@@ -62,16 +69,24 @@ app.get('/gauntlet/account/register/:username/:passwordhash', function(req, res)
 /**
  * User authentication. For now, their unique authentication token will just be their ID.
  * Yes, vulnerable to replay attacks, but keep it simple for the hackathon, will fix it later.
+ * Returns a user token which the user must provide in the future to verify their identity.
  */
 app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, res) {
+  console.log("User attempting auth " + req.params.username + "," + req.params.passwordhash);
   db.collection('accounts', function(err, collection) {
     if (err) {
+      console.log("ERR_auth_1");
       res.json({success:false});
       throw err;
     }
 
     collection.find({username:req.params.username, passwordhash: req.params.passwordhash}, function(err, cursor) {
       cursor.count(function(err, count) {
+        if (err) {
+          console.log("ERR_auth_2");
+          res.json({success:false});
+          throw err;
+        }
         if (count == 0) {
           console.log("User failed authentication");
           res.json({success:false,auth:'null'});
@@ -93,7 +108,8 @@ app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, 
 /**
  * Checks if an authentication token corresponds to a particular user.
  */
-function checkAuth(token, user) {
+function checkToken(token, user) {
+  console.log('Attempting to authenticate <' + token + ',' + user +'>');
   console.log("faking the auth for testing");
   return true;
 
@@ -122,28 +138,34 @@ function checkAuth(token, user) {
  * Get minion list.
  */
 app.get('/gauntlet/minions/list/:auth/:username', function (req, res) {
-  if (!checkAuth(req.params.auth, req.params.username)) {
+  console.log("Attempting to list minions...");
+  if (!checkToken(req.params.auth, req.params.username)) {
+    console.log("ERR_list_1");
     res.json({success:false});
     return false;
   }
 
   db.collection('minions', function(err, collection) {
     if (err) {
+      console.log("ERR_list_2");
       res.json({success:false});
       throw err;
     }
 
     collection.find({username: req.params.username},{}, function(err, cursor) {
       if (err) {
+        console.log("ERR_list_3");
         res.json({success:false});
         throw err;
       }
 
       cursor.toArray(function(err, documents) {
         if (err) {
+          console.log("ERR_list_4");
           res.json({success:false});
           throw err;
         }
+        console.log("Sending minion list:\n%j", documents);
         res.json(documents);
       });
     });
@@ -154,46 +176,54 @@ app.get('/gauntlet/minions/list/:auth/:username', function (req, res) {
  * Capture a minion!
  */
 app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minon_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4/:minion_stat_strength/:minion_stat_intelligence/:minion_stat_dexterity/:minion_stat_speed/:minion_stat_health/:minion_stat_coffeemaking', function(req, res) {
-  if (!checkAuth(req.params.auth, req.params.username)) {
+  console.log("Attempting to capture minion...");
+  if (!checkToken(req.params.auth, req.params.username)) {
+    console.log('ERR_capture_1');
     res.json({success:false});
     return false;
   }
 
   db.collection('minions', function(err, collection) {
     if (err) {
+      console.log('ERR_capture_2');
       res.json({success:false});
     }
 
+    var obj =   {
+      date: Math.round(new Date().getTime() / 1000),
+      username: req.params.username,
+      minion_picture: req.params.minion_picture,
+      minion_name: req.params.minion_name,
+      minion_description: req.params.minion_description,
+      minion_type: req.params.minion_type,
+      minion_moveID1: req.params.minion_moveID1,
+      minion_moveAlias1: req.params.minion_moveAlias1,
+      minion_moveID1: req.params.minion_moveID2,
+      minion_moveAlias1: req.params.minion_moveAlias2,
+      minion_moveID1: req.params.minion_moveID3,
+      minion_moveAlias1: req.params.minion_moveAlias3,
+      minion_moveID1: req.params.minion_moveID4,
+      minion_moveAlias1: req.params.minion_moveAlias4,
+      minion_stat_strength: req.params.minion_stat_strength,
+      minion_stat_intelligence: req.params.minion_stat_intelligence,
+      minion_stat_dexterity: req.params.minion_stat_dexterity,
+      minion_stat_speed: req.params.minion_stat_speed,
+      minion_stat_health: req.params.minion_stat_health,
+      minion_stat_coffeemaking: req.params.minion_stat_coffeemaking,
+    };
+
+    console.log("Capturing minion:\n%j", obj);
+
     collection.insert(
-      {
-        date: Math.round(new Date().getTime() / 1000),
-        username: req.params.username,
-        minion_picture: req.params.minion_picture,
-        minion_name: req.params.minion_name,
-        minion_description: req.params.minion_description,
-        minion_type: req.params.minion_type,
-        minion_moveID1: req.params.minion_moveID1,
-        minion_moveAlias1: req.params.minion_moveAlias1,
-        minion_moveID1: req.params.minion_moveID2,
-        minion_moveAlias1: req.params.minion_moveAlias2,
-        minion_moveID1: req.params.minion_moveID3,
-        minion_moveAlias1: req.params.minion_moveAlias3,
-        minion_moveID1: req.params.minion_moveID4,
-        minion_moveAlias1: req.params.minion_moveAlias4,
-        minion_stat_strength: req.params.minion_stat_strength,
-        minion_stat_intelligence: req.params.minion_stat_intelligence,
-        minion_stat_dexterity: req.params.minion_stat_dexterity,
-        minion_stat_speed: req.params.minion_stat_speed,
-        minion_stat_health: req.params.minion_stat_health,
-        minion_stat_coffeemaking: req.params.minion_stat_coffeemaking,
-      },
+      obj,
       function(err, count) {
         if (err) {
+          console.log('ERR_capture_3');
           res.json({success:false});
           throw err;
         }
 
-        console.log('Minion added~');
+        console.log('Minion captured.');
         res.json({success:true});
       }
     );
@@ -202,4 +232,4 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
 
 
 app.listen(6699);
-console.log("gauntlet server listening on 6699");
+console.log("Gauntlet server listening on 6699!");
