@@ -262,7 +262,8 @@ function getMinionFromID(minionID) {
 /**
  * Start a battle!
  */
-app.get('/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID', function(req, res) {
+app.get('/gauntlet/battle/start/:auth/:username/:targetUsername/:yourMinionID/:targetMinionID', function(req, res) {
+  console.log("Starting a battle...");
   if (!checkToken(req.params.auth, req.params.username)) {
     res.json({success:false});
     return false;
@@ -280,9 +281,10 @@ app.get('/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID', 
 
     var obj = {
       host: req.params.username,
+      guest: req.params.targetUsername,
       minionHost: hostMinion
       minionGuest: guestMinion
-      yourTurn: true,
+      hostTurn: true,
       active: true,
       hostHealth: hostMinion.minion_stat_health,
       guestHealth: guestMinion.minion_stat_health,
@@ -306,6 +308,44 @@ app.get('/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID', 
   });
 });
 
+/**
+ * List battles you're involved in.
+ */
+app.get('/gauntlet/battle/list/:auth/:username', function(req, res) {
+  console.log("Starting to list battles for " + req.params.username);
+  if (!checkToken(req.params.auth, req.params.username)) {
+    res.json({success:false});
+    return false;
+  }
+
+
+  db.collection('battles', function(err, collection) {
+    if (err) {
+      console.log("ERR_listbattle_1");
+      res.json({success:false});
+      throw err;
+    }
+
+    //find any battles in which we are involved.
+    collection.find({$or:[{host:req.params.username},{guest:req.params.username}]},{}, function(err, cursor) {
+      if (err) {
+        console.log("ERR_listbattle_2");
+        throw err;
+      }
+
+      cursor.toArray(function(err, documents) {
+        if (err) {
+          console.log("ERR_listbattle_3");
+          throw err;
+        }
+        console.log("Returning looked-up battles:\n%j", documents);
+        res.json(documents);
+      });
+    });
+
+
+  });
+});
 
 app.listen(6699);
 console.log("Gauntlet server listening on 6699!");

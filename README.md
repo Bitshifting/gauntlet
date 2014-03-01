@@ -81,7 +81,7 @@ The following IDs map to the following base moves. (TODO: For now look at the go
 
 A battle is a conflict between one of your minions and another minion. You can create a battle at any time and a minion can be in multiple battles at once (all separate 'instances' of the minion - health, etc. is tracked per battle instance and multiple of them can be going on at once with the same base minion, you don't have to heal your minions, etc.) This should make it more social if you want one of your minions to fight two different friends' minions in about the same timeframe.
 
-### `/gauntlet/battle/start/:auth/:username/:yourMinionID/:targetMinionID`
+### `/gauntlet/battle/start/:auth/:username/:targetUsername/:yourMinionID/:targetMinionID`
 
 Whoever starts a battle goes first. Should use /minions/list on the opponent to find the minionID that you want to fight, and then name both it and the ID of one of your own minions to battle.
 
@@ -93,7 +93,7 @@ Response like `{"success":true}`
 
 Returns a list of battles for this user, where each entry in the list has a battle ID and the objects of the involved minions, as well as the turn state. **You should poll this periodically to check if you have any battle requests and then have user input which triggers calls to other API requests for battle**. if `active` then both minions are still alive.
 
-Response like `[{"_id":"1234","yourMinion":{minion object},"targetMinion":{minion object},"yourTurn":false,"active":true,"yourHealth":10,"targetHealth":10},]`
+Response like `[{"_id":"1234","hostMinion":{minion object},"guestMinion":{minion object},"hostTurn":false,"active":true,"hostHealth":10,"guestHealth":10},]`
 
 ### `/gauntlet/battle/move/:auth/:username/:battleID/:move`
 
