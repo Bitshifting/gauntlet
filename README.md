@@ -33,6 +33,7 @@ Response like `[{<SEE MINION OBJECT SPECIFICATION>},]`
 
 Capture a minion for `username`! This should be you (it'll fail otherwise if your auth token is wrong). The implementing application should provide values for the following fields:
 
+* `date` : When this minion was captured (unix timestamp)
 * `minion_name` : The name of the minion (to be shown to other users).
 * `minion_picture` : A direct link to a JPG or PNG somewhere to represent the minion. Will probably be Imgur, but whatever.
 * `minion_description` : A short bio about this minion. For example, where its natural habitat is, what foods it likes to eat, etc.
@@ -48,7 +49,7 @@ Capture a minion for `username`! This should be you (it'll fail otherwise if you
 
 The server then replies with a minion object (specified below).
 
-Response like `{"success":true,"minion":{<SEE MINION OBJECT SPECIFICATION>}}`
+Response like `{"success":true}`
 
 ### Minion Object
 
