@@ -521,11 +521,13 @@ app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, r
     //TODO: For now just -1 from their health, read from moves integer
     if (battle.hostTurn) {
       lstDmg = getDamageValue(moveInternalID, host, target);
+      console.log("host attacked for " + lstDmg);
       battle.guestHealth -= lstDmg;
       if (guestHealth <= 0)
         battle.active = false;
     }else {
       lstDmg = getDamageValue(moveInternalID, target, host);
+      console.log("guest attacked for " + lastDmg);
       battle.hostHealth -= lstDmg;
       if (hostHealth <= 0)
         battle.active = false;
