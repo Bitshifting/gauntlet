@@ -228,7 +228,7 @@ app.get('/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/
         }
 
         console.log('Minion captured.');
-        res.json({success:true});
+        res.json({success:true, "_id":obj._id});
       }
     );
   });
@@ -518,7 +518,6 @@ app.get('/gauntlet/battle/move/:auth/:username/:battleID/:move', function(req, r
 
     var lstDmg;
     //Ok go, update the health and re-write the state!
-    //TODO: For now just -1 from their health, read from moves integer
     if (battle.hostTurn) {
       lstDmg = getDamageValue(moveInternalID, host, target);
       console.log("host attacked for " + lstDmg);

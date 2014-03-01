@@ -47,15 +47,14 @@ Capture a minion for `username`! This should be you (it'll fail otherwise if you
 * `minion_stat_health`
 * `minion_stat_coffeemaking`
 
-The server then replies with a minion object (specified below).
-
-Response like `{"success":true}`
+Response like `{"success":true, "_id":"abc1234"}`
 
 ### Minion Object
 
 The following object represents a minion and will be returned.
 
 `{`
+`"_id":"1234abc",
 `"minion_name":"name",`
 `"minion_picture":"http://your.face",`
 `"minion_description":"Some biography about this minion",`
