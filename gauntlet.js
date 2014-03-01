@@ -96,11 +96,14 @@ app.get('/gauntlet/account/authenticate/:username/:passwordhash', function(req, 
 function checkAuth(token, user) {
   db.collection('accounts', function(err, collection) {
     if (err) {
-      res.json({success:false});
       throw err;
     }
 
     collection.find({username: user, _id: token}, {}, function(err, cursor) {
+      if (err) {
+        throw err;
+      }
+
       cursor.count(function(err, count) {
         if (count == 0)
           return false;
@@ -110,6 +113,37 @@ function checkAuth(token, user) {
   });
 }
 
+/**
+ * Get minion list.
+ */
+app.get('/gauntlet/minions/list/:auth/:username', function (req, res) {
+  if (!checkAuth(req.params.auth, req.params.username)) {
+    res.json({success:false});
+    return false;
+  }
+
+  db.collection('minions', function(err, collection) {
+    if (err) {
+      res.json({success:false});
+      throw err;
+    }
+
+    collection.find({username: req.params.username},{}, function(err, cursor) {
+      if (err) {
+        res.json({success:false});
+        throw err;
+      }
+
+      cursor.toArray(function(err, documents) {
+        if (err) {
+          res.json({success:false});
+          throw err;
+        }
+        res.json(documents);
+      });
+    });
+  });
+});
 
 
 

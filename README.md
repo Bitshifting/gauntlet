@@ -27,7 +27,7 @@ Response like `{"success":true,"auth":"1234567890abcdef"}`
 
 Returns a list of collected minions (with all attributes) belonging to your user account (inferred from auth token). Username field is ingored but could be used for future use if you"re listing someone else"s collection.
 
-Response like `{"success":true,"minions":[{<SEE MINION OBJECT SPECIFICATION>},]}`
+Response like `[{<SEE MINION OBJECT SPECIFICATION>},]`
 
 ### `/gauntlet/minions/capture/:auth/:username/:minion_picture/:minion_name/:minon_description/:minion_type/:minion_moveID1/:minion_moveAlias1/:minion_moveID2/:minion_moveAlias2/:minion_moveID3/:minion_moveAlias3/:minion_moveID4/:minion_moveAlias4/:minion_stat_strength/:minion_stat_intelligence/:minion_stat_dexterity/:minion_stat_speed/:minion_stat_health/:minion_stat_coffeemaking`
 
