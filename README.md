@@ -3,11 +3,13 @@ gauntlet
 
 The ultimate showdown! Collect minions, train them, level them, trade them, battle them!
 
+API Endpoints at (you know the URI .alexkersten.com) port 6699
+
 # API Detail
 
 ## Account functionality
 
-### `/gauntlet/account/register/:username/:passwordhash/`
+### `/gauntlet/account/register/:username/:passwordhash`
 
 Register a user account. If the account already exists, returns false.
 
